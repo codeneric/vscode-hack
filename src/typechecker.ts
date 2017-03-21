@@ -9,11 +9,15 @@ import * as hh_client from './proxy';
 
 // tslint:disable-next-line:export-name
 export class HackTypeChecker {
-    constructor(private hhvmTypeDiag: vscode.DiagnosticCollection) {}
+    constructor(private hhvmTypeDiag: vscode.DiagnosticCollection, private hhvmSoftDiag: vscode.DiagnosticCollection) {}
 
-    public async run() {
+    public async run(document: vscode.TextDocument) {
         const typecheckResult = await hh_client.check();
         this.hhvmTypeDiag.clear();
+
+        if (document !== null) {
+            await this.runCustom(document);
+        }
 
         if (!typecheckResult || typecheckResult.passed) {
             return;
@@ -42,5 +46,37 @@ export class HackTypeChecker {
         diagnosticMap.forEach((diags, file) => {
             this.hhvmTypeDiag.set(vscode.Uri.file(file), diags);
         });
+    }
+
+    /**
+     * Optionally run a set of custom "soft" typecheck rules that aren't enforced by hh_client
+     */
+    public async runCustom(document: vscode.TextDocument) {
+        this.hhvmSoftDiag.clear();
+        const text = document.getText();
+        const documentSymbols = await hh_client.outline(text);
+        if (!documentSymbols || documentSymbols.length === 0) {
+            return;
+        }
+
+        const diagnosticCollection: vscode.Diagnostic[] = [];
+        for (const documentSymbol of documentSymbols) {
+            if (documentSymbol.kind === 'function') {
+                const found = await hh_client.ideFindRefs(text, documentSymbol.position.line, documentSymbol.position.char_start);
+                if (!found) {
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(
+                            new vscode.Position(documentSymbol.position.line - 1, documentSymbol.position.char_start - 1),
+                            new vscode.Position(documentSymbol.position.line - 1, documentSymbol.position.char_end)),
+                        'Reference not found in Typechecked code.',
+                        vscode.DiagnosticSeverity.Warning);
+                    diagnostic.source = 'Hack (Custom)';
+                    diagnosticCollection.push(diagnostic);
+                }
+            }
+        }
+        if (diagnosticCollection.length > 0) {
+            this.hhvmSoftDiag.set(document.uri, diagnosticCollection);
+        }
     }
 }

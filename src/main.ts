@@ -37,9 +37,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // create typechecker and run on file save
     const hhvmTypeDiag: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('hack_typecheck');
-    const typechecker = new HackTypeChecker(hhvmTypeDiag);
-    context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(document => { typechecker.run(); }));
+    const hhvmSoftDiag: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('hack_typecheck_soft');
+    const typechecker = new HackTypeChecker(hhvmTypeDiag, hhvmSoftDiag);
+    context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(document => { typechecker.run(document); }));
     context.subscriptions.push(hhvmTypeDiag);
+    context.subscriptions.push(hhvmSoftDiag);
 
     // create coverage checker and run on file open & save
     const coverageStatus: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
@@ -58,7 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('hack.toggleCoverageHighlight', () => { coveragechecker.toggle(); }));
 
     // also run the type & coverage checkers when the workspace is loaded for the first time
-    await typechecker.run();
+    await typechecker.run(null);
     for (const document of vscode.workspace.textDocuments) {
         await coveragechecker.run(document, true);
     }
