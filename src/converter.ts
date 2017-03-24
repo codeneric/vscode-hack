@@ -47,7 +47,7 @@ export async function checkDupes() {
                         console.log('Couldn\'t get results for ' + sym);
                     } else {
                         searchResult.forEach(res => {
-                            if (res.name === sym) {
+                            if (res.name === sym && res.scope === '') {
                                 if (!dupes.has(sym)) {
                                     dupes.set(sym, [res]);
                                 } else {
@@ -74,10 +74,12 @@ export async function checkDupes() {
 
     console.log(__dirname);
 
+    let i = 1;
     for (const y of a) {
-        fs.appendFileSync(__dirname + '/dupes.csv', y[0] + os.EOL);
+        fs.appendFileSync(__dirname + '/dupes.csv', i + ',' + y[0] + os.EOL);
+        i += 1;
         for (const yn of y[1]) {
-            const line = ',' + yn.filename + ',' + yn.line + ',' + yn.scope + os.EOL;
+            const line = ',' + ',' + yn.filename + ',' + yn.line + ',' + yn.scope + os.EOL;
             fs.appendFileSync(__dirname + '/dupes.csv', line);
         }
         // console.log(y[0] + ' - ' + y[1].length + ' definitions');
