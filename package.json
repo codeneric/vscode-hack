@@ -83,6 +83,10 @@
       {
         "command": "hack.toggleCoverageHighlight",
         "title": "Hack: Toggle Coverage Highlight"
+      },
+      {
+        "command": "hack.convertPhpToHack",
+        "title": "Hack: Convert all PHP files to Hack"
       }
     ]
   },

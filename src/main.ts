@@ -5,6 +5,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as converter from './converter';
 import { HackCoverageChecker } from './coveragechecker';
 import * as providers from './providers';
 import * as hh_client from './proxy';
@@ -57,11 +58,16 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(coverageStatus);
     context.subscriptions.push(vscode.commands.registerCommand('hack.toggleCoverageHighlight', () => { coveragechecker.toggle(); }));
 
+    // PHP to Hack converter command
+    // context.subscriptions.push(vscode.commands.registerCommand('hack.convertPhpToHack', () => { converter.checkDupes(); }));
+
     // also run the type & coverage checkers when the workspace is loaded for the first time
-    await typechecker.run();
-    for (const document of vscode.workspace.textDocuments) {
+    // await typechecker.run();
+    /*for (const document of vscode.workspace.textDocuments) {
         await coveragechecker.run(document, true);
-    }
+    }*/
+
+    await converter.checkDupes();
 }
 
 export function deactivate() {
