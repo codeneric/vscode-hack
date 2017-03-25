@@ -166,11 +166,8 @@ export class HackCompletionItemProvider implements vscode.CompletionItemProvider
     }
 }
 
-export class HackDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider {
-    public async provideDocumentFormattingEdits(
-        document: vscode.TextDocument,
-        options: vscode.FormattingOptions,
-        token: vscode.CancellationToken): Promise<vscode.TextEdit[]> {
+export class HackDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider, vscode.OnTypeFormattingEditProvider {
+    private async getEdits(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
         const text: string = document.getText();
         const formatResult = await hh_client.format(text, 0, text.length);
         if (formatResult.internal_error || formatResult.error_message) {
@@ -179,7 +176,23 @@ export class HackDocumentFormattingEditProvider implements vscode.DocumentFormat
         const textEdit = vscode.TextEdit.replace(
             new vscode.Range(document.positionAt(0), document.positionAt(text.length)), formatResult.result);
         return [textEdit];
+    }
+
+    public async provideDocumentFormattingEdits(
+        document: vscode.TextDocument,
+        options: vscode.FormattingOptions,
+        token: vscode.CancellationToken): Promise<vscode.TextEdit[]> {
+        return this.getEdits(document);
     };
+
+    public async provideOnTypeFormattingEdits(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        ch: string,
+        options: vscode.FormattingOptions,
+        token: vscode.CancellationToken): Promise<vscode.TextEdit[]> {
+        return this.getEdits(document);
+    }
 }
 
 export class HackReferenceProvider implements vscode.ReferenceProvider {
