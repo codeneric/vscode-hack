@@ -35,6 +35,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(HACK_MODE, new providers.HackDocumentFormattingEditProvider()));
     context.subscriptions.push(vscode.languages.registerReferenceProvider(HACK_MODE, new providers.HackReferenceProvider()));
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(HACK_MODE, new providers.HackDefinitionProvider()));
+    context.subscriptions.push(vscode.languages.registerSignatureHelpProvider(HACK_MODE, new providers.HackSignatureHelpProvider(), '('));
 
     // create typechecker and run when workspace is first loaded and on every file save
     const hhvmTypeDiag: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('hack_typecheck');

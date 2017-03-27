@@ -39,7 +39,7 @@ export async function typeAtPos(fileName: string, line: number, character: numbe
     return typeAtPos.type;
 }
 
-export async function outline(text: string): Promise<OutlineResponse[]> { // tslint:disable-line
+export async function outline(text: string): Promise<Outline[]> { // tslint:disable-line
     return run(['--outline'], text);
 }
 
@@ -57,6 +57,10 @@ export async function ideHighlightRefs(text: string, line: number, character: nu
 
 export async function ideGetDefinition(text: string, line: number, character: number): Promise<IdeGetDefinitionResponse> {
     return run(['--ide-get-definition', line + ':' + character], text);
+}
+
+export async function getDefinitionById(id: string): Promise<Outline> {
+    return run(['--get-definition-by-id', id]);
 }
 
 export async function autoComplete(text: string, position: number): Promise<AutoCompleteResponse> {
@@ -138,13 +142,15 @@ type ColorResponse = {
     text: string
 }[];
 
-export type OutlineResponse = {
+export type Outline = {
     name: string,
     kind: string,
     id: string,
     position: Position,
     span: Span,
-    children: OutlineResponse[]
+    children: Outline[],
+    modifiers: string[],
+    params: Outline[]
 };
 
 type SearchResponse = {
@@ -177,7 +183,7 @@ type IdeGetDefinitionResponse = {
     pos: Position,
     definition_pos: Position,
     definition_span: Span,
-    definition_id: number
+    definition_id: string
 }[];
 
 type AutoCompleteResponse = {

@@ -54,7 +54,7 @@ const getSymbolKind = (symbolType: string): vscode.SymbolKind => {
     return symbolMap.has(symbolType) ? symbolMap.get(symbolType) : vscode.SymbolKind.Null;
 };
 
-const pushSymbols = (outline: hh_client.OutlineResponse[], symbols: vscode.SymbolInformation[], container: string, indent: string) => {
+const pushSymbols = (outline: hh_client.Outline[], symbols: vscode.SymbolInformation[], container: string, indent: string) => {
     outline.forEach(element => {
         let name = element.name;
         const nameIndex = name.lastIndexOf('\\');
@@ -226,5 +226,28 @@ export class HackDefinitionProvider implements vscode.DefinitionProvider {
             }
         });
         return definition;
+    }
+}
+
+export class HackSignatureHelpProvider implements vscode.SignatureHelpProvider {
+    public async provideSignatureHelp(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.SignatureHelp> {
+        const text = document.getText();
+        const definition = await hh_client.ideGetDefinition(text, position.line + 1, position.character);
+        if (definition !== null && definition.length > 0 && (definition[0].result_type === 'function' || definition[0].result_type === 'method')) {
+            const definitionById = await hh_client.getDefinitionById(definition[0].definition_id);
+            if (definitionById !== null) {
+                const signatureHelp = new vscode.SignatureHelp();
+                signatureHelp.activeParameter = 0;
+                signatureHelp.activeSignature = 0;
+                const signatureInformation = new vscode.SignatureInformation(definitionById.name);
+                definitionById.params.forEach(param => {
+                    const parameterInformation = new vscode.ParameterInformation(param.name);
+                    signatureInformation.parameters.push(parameterInformation);
+                });
+                signatureHelp.signatures.push(signatureInformation);
+                return signatureHelp;
+            }
+        }
+        return null;
     }
 }
