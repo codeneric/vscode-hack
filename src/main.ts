@@ -15,6 +15,15 @@ import * as utils from './Utils';
 export async function activate(context: vscode.ExtensionContext) {
 
     // check if a compatible verison of hh_client is installed, or show an error message and deactivate extension typecheck & intellisense features
+    try{
+        await hh_client.statr_hack_container();
+    }catch(e){
+        vscode.window.showErrorMessage(
+            `Codeneric: failed to start hack container!`
+        );
+        return;
+    }
+    
     const version = await hh_client.version();
     if (!version) {
         vscode.window.showErrorMessage(

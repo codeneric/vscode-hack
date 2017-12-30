@@ -1,3 +1,7 @@
+# Discalimer
+Codeneric has only forked the [original VSCode Hack extension](https://marketplace.visualstudio.com/items?itemName=pranayagarwal.vscode-hack) to make some use case specific modifications. Thus, all the credit for the awesome extension goes to Pranay Agarwal. Furthermore, this fork will not implement all the new Hack language features, because we are focusing on transpiling Hack to PHP rather than building native Hack applications.
+This fork might be instersting for you if you want to build WordPress plugins with Hack, otherwise you should probably stay with Pranay's repo. 
+
 # Hack for Visual Studio Code
 
 [![Build Status](https://travis-ci.org/PranayAgarwal/vscode-hack.svg?branch=master)](https://travis-ci.org/PranayAgarwal/vscode-hack)
