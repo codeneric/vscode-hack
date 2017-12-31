@@ -92,7 +92,8 @@ export async function format(
   // final character when there is no newline at the end of the file.
   //
   // This appears to be a bug in `hh_client --format`.
-  return run(["--format", startPos.toString(), (endPos + 1).toString()], text);
+  // text += "\n";
+  return run(["--format", startPos.toString(), (endPos + 2).toString()], text);
 }
 
 async function run(extraArgs: string[], stdin?: string): Promise<any> {
