@@ -9,17 +9,8 @@
   "displayName": "Codeneric Hack",
   "description": "Hack/HHVM support for Visual Studio Code.",
   "icon": "images/logo.png",
-  "categories": [
-    "Languages",
-    "Linters",
-    "Snippets",
-    "Other"
-  ],
-  "keywords": [
-    "hack",
-    "hacklang",
-    "hhvm"
-  ],
+  "categories": ["Languages", "Linters", "Snippets", "Other"],
+  "keywords": ["hack", "hacklang", "hhvm"],
   "galleryBanner": {
     "color": "#5d5d5d",
     "theme": "dark"
@@ -39,15 +30,9 @@
     "languages": [
       {
         "id": "hack",
-        "aliases": [
-          "Hack",
-          "hacklang"
-        ],
+        "aliases": ["Hack", "hacklang"],
         "configuration": "./hack.configuration.json",
-        "extensions": [
-          ".php",
-          ".hh"
-        ],
+        "extensions": [".php", ".hh"],
         "firstLine": "^<\\?hh\\b.*$"
       }
     ],
@@ -71,22 +56,26 @@
         "hack.clientPath": {
           "type": "string",
           "default": null,
-          "description": "Absolute path to the hh_client executable. This can be left empty if hh_client is already in your environment $PATH. A `docker exec` command is supported as well."
+          "description":
+            "Absolute path to the hh_client executable. This can be left empty if hh_client is already in your environment $PATH. A `docker exec` command is supported as well."
         },
         "hack.workspaceRootPath": {
           "type": "string",
           "default": null,
-          "description": "Absolute path to the workspace root directory. This will be the VS Code workspace root by default, but can be changed if the project is in a subdirectory or mounted in a Docker container."
+          "description":
+            "Absolute path to the workspace root directory. This will be the VS Code workspace root by default, but can be changed if the project is in a subdirectory or mounted in a Docker container."
         },
         "hack.enableCoverageCheck": {
           "type": "boolean",
           "default": false,
-          "description": "Enable calculation of Hack type coverage percentage for every file and display in status bar."
+          "description":
+            "Enable calculation of Hack type coverage percentage for every file and display in status bar."
         },
         "hack.useLanguageServer": {
           "type": "boolean",
           "default": false,
-          "description": "[Experimental] Start hh_client in Language Server mode. Only works for HHVM version 3.23 and above."
+          "description":
+            "[Experimental] Start hh_client in Language Server mode. Only works for HHVM version 3.23 and above."
         }
       }
     },
@@ -97,9 +86,7 @@
       }
     ]
   },
-  "activationEvents": [
-    "workspaceContains:.hhconfig"
-  ],
+  "activationEvents": ["workspaceContains:.hhconfig"],
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",

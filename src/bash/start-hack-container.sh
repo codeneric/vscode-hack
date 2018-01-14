@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONT_NAME="hack"
+CONT_NAME="$2"
 
 docker rm -f ${CONT_NAME} 2>/dev/null
 

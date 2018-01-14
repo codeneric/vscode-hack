@@ -5,7 +5,6 @@
 import * as ps from "child_process";
 import * as config from "./Config";
 import * as hack from "./types/hack";
-import * as vscode from "vscode";
 
 export async function version(): Promise<hack.Version | undefined> {
   return run(["--version"]);
@@ -94,18 +93,18 @@ export async function format(
   //
   // This appears to be a bug in `hh_client --format`.
   // text += "\n";
-  function tmp(formatResponse: hack.FormatResponse){
-    console.log(formatResponse);
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
-      const position = editor.selection.active;
+  // function tmp(formatResponse: hack.FormatResponse){
+  //   console.log(formatResponse);
+  //   const editor = vscode.window.activeTextEditor;
+  //   if (editor) {
+  //     const position = editor.selection.active;
 
-      var newPosition = position.with(position.line, 0);
-      var newSelection = new vscode.Selection(newPosition, newPosition);
-      editor.selection = newSelection;
-    }
-  }
-  
+  //     var newPosition = position.with(position.line, 0);
+  //     var newSelection = new vscode.Selection(newPosition, newPosition);
+  //     editor.selection = newSelection;
+  //   }
+  // }
+
   let p = run(["--format", startPos.toString(), (endPos + 2).toString()], text);
   // p.then(tmp);
   return p;
@@ -151,11 +150,14 @@ async function run(extraArgs: string[], stdin?: string): Promise<any> {
 
 /**********************************CUSTOM*******************************/
 
-export async function statr_hack_container(): Promise<string> {
+export async function start_hack_container(): Promise<string> {
   return new Promise<any>((resolve, reject) => {
     // console.log(`COMMAND: ./bash/start-hack-container.sh ${config.workspace}`);
+    let cont_name = config.get_container_name(config.workspace);
     ps.exec(
-      `bash ${__dirname}/bash/start-hack-container.sh ${config.workspace}`,
+      `bash ${__dirname}/bash/start-hack-container.sh ${
+        config.workspace
+      } ${cont_name}`,
       err => {
         if (err) {
           reject("starting hack container failed!");
