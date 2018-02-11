@@ -81,6 +81,43 @@ export class HackHoverProvider implements vscode.HoverProvider {
             if (hoverType.startsWith('(function')) {
                 hoverType = hoverType.slice(1, hoverType.length - 1);
             }
+
+            if (hoverType.startsWith('shape') ||
+                hoverType.startsWith('?shape') ||
+                hoverType.startsWith('array') ||
+                hoverType.startsWith('?array') 
+            ) {
+                let l = i => Array(i).join(" ");
+                // hoverType = hoverType.replace(/,/g, ',\n');
+                let res = '';
+                let i = 0;
+                let k = 0;
+                for (const c of hoverType) {
+                    switch (c) {
+                        case ' ':
+                            if (hoverType[k + 1] !== '=' && hoverType[k - 1] !== '>')
+                                res = `${res}${l(i)}`;
+                            break;
+                        case ',':
+                            res = `${res},\n`;
+                            break;
+                        case '(':
+                            i++;
+                            res = `${res}(\n${l(i)}`;
+                            break;
+                        case ')':
+                            i--;
+                            res = `${res}\n${l(i)})`;
+                            break;
+                        default:
+                            res = `${res}${c}`;
+                            break;
+                    }
+                    k++;
+                }
+                hoverType = res;
+            }
+
             const formattedMessage: vscode.MarkedString = { language: 'hack', value: hoverType };
             return new vscode.Hover(formattedMessage);
         });

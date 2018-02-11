@@ -29,6 +29,7 @@ export class HackTypeChecker {
                 if (code === 0) {
                     code = messageUnit.code;
                 }
+                
                 // let r = new vscode.Range(
                 //     new vscode.Position(messageUnit.line -1, messageUnit.start -1),
                 //     new vscode.Position(messageUnit.line -1, messageUnit.end ));
