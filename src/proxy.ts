@@ -110,41 +110,150 @@ export async function format(
   return p;
 }
 
+
+function run_hh_client(hh_client, args, resolve, stdin?: string) {
+  const p = ps.execFile(
+    hh_client,
+    args,
+    { maxBuffer: 1024 * 1024 },
+    (err: any, stdout, stderr) => {
+      if (err !== null && err.code !== 0 && err.code !== 2) {
+        // any hh_client failure other than typecheck errors
+        console.error(`Hack: hh_client execution error: ${err}`);
+        resolve();
+      }
+      if (!stdout) {
+        // all hh_client --check output goes to stderr by default
+        stdout = stderr;
+      }
+      try {
+        const output = JSON.parse(stdout);
+        resolve(output);
+      } catch (parseErr) {
+        console.error(`Hack: hh_client output error: ${parseErr}`);
+        resolve();
+      }
+    }
+  );
+  if (stdin) {
+    p.stdin.write(stdin);
+    p.stdin.end();
+  }
+}
+
+function merge_errors(a: any, b: any) {
+  let res: any = a ? a : b;
+  if (a && a.errors) {
+    res = a;
+  }
+  if (b && b.errors) {
+    if (!a || !a.errors)
+      res = b;
+    else {
+      //merge
+      res.errors = b.errors.concat(a.errors);
+      //filter & error msg
+      res.errors = res.errors.filter((e) => {
+        if (e.message) {
+          return !e.message.find((l) => l.code === 4168);
+        }
+        return true;
+      });
+      // make unique
+      res.errors = Array.from(
+        new Set(
+          res.errors
+          .map(e => JSON.stringify(e))
+        )
+      )
+      .map((e:any) => JSON.parse(e));
+    }
+  }
+
+  return res;
+}
+
+
 async function run(extraArgs: string[], stdin?: string): Promise<any> {
   return new Promise<any>((resolve, _) => {
-    const args: string[] = [
-      ...config.hhClientArgs,
-      ...extraArgs,
-      "--json",
-      config.workspace
-    ];
-    const p = ps.execFile(
-      config.hhClientCommand,
-      args,
-      { maxBuffer: 1024 * 1024 },
-      (err: any, stdout, stderr) => {
-        if (err !== null && err.code !== 0 && err.code !== 2) {
-          // any hh_client failure other than typecheck errors
-          console.error(`Hack: hh_client execution error: ${err}`);
-          resolve();
-        }
-        if (!stdout) {
-          // all hh_client --check output goes to stderr by default
-          stdout = stderr;
-        }
-        try {
-          const output = JSON.parse(stdout);
-          resolve(output);
-        } catch (parseErr) {
-          console.error(`Hack: hh_client output error: ${parseErr}`);
-          resolve();
-        }
-      }
-    );
-    if (stdin) {
-      p.stdin.write(stdin);
-      p.stdin.end();
+    let docker_hh_client = config.hhClientCommand;
+    let latest_hh_client = 'hh_client';
+
+    let docker_hh = { 'hh_client': docker_hh_client, 'args': config.hhClientArgs };
+    let latest_hh = { 'hh_client': latest_hh_client, 'args': [] };
+    let hhcs: any[] = [latest_hh];
+
+
+
+    if (extraArgs.indexOf("--type-at-pos") >= 0) {
+      hhcs = [latest_hh];
     }
+    if (extraArgs.indexOf("check") >= 0) {
+      hhcs = [latest_hh, docker_hh];
+    }
+
+    let finished_children = 0;
+    let global_output: any = null;
+
+    let _resolve = (o: any = null) => {
+      finished_children++;
+      if (finished_children >= hhcs.length) {
+        //other has finished
+        if (o !== null) {
+          let merged = merge_errors(o, global_output);
+          
+          resolve(merged);
+        }
+        else {
+          resolve(global_output);
+        }
+
+
+      } else {
+        global_output = o;
+      }
+
+    }
+
+    for (const hhc of hhcs) {
+      const args: string[] = [
+        ...hhc.args,
+        ...extraArgs,
+        "--json",
+        config.workspace
+      ];
+      run_hh_client(hhc.hh_client, args, _resolve, stdin);
+    }
+
+
+
+    // const p = ps.execFile(
+    //   hhc.hh_client,
+    //   args,
+    //   { maxBuffer: 1024 * 1024 },
+    //   (err: any, stdout, stderr) => {
+    //     if (err !== null && err.code !== 0 && err.code !== 2) {
+    //       // any hh_client failure other than typecheck errors
+    //       console.error(`Hack: hh_client execution error: ${err}`);
+    //       resolve();
+    //     }
+    //     if (!stdout) {
+    //       // all hh_client --check output goes to stderr by default
+    //       stdout = stderr;
+    //     }
+    //     try {
+    //       const output = JSON.parse(stdout);
+    //       resolve(output);
+    //     } catch (parseErr) {
+    //       console.error(`Hack: hh_client output error: ${parseErr}`);
+    //       resolve();
+    //     }
+    //   }
+    // );
+    // if (stdin) {
+    //   p.stdin.write(stdin);
+    //   p.stdin.end();
+    // }
   });
 }
 
@@ -156,7 +265,7 @@ export async function start_hack_container(): Promise<string> {
     let cont_name = config.get_container_name(config.workspace);
     ps.exec(
       `bash ${__dirname}/bash/start-hack-container.sh ${
-        config.workspace
+      config.workspace
       } ${cont_name}`,
       err => {
         if (err) {
