@@ -83,7 +83,11 @@
       {
         "command": "hack.toggleCoverageHighlight",
         "title": "Hack: Toggle Coverage Highlight"
-      }
+      },
+      {
+            "command": "hack.openBuild",
+            "title": "Open build"
+        }
     ]
   },
   "activationEvents": ["workspaceContains:.hhconfig"],

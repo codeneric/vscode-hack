@@ -152,10 +152,11 @@ function merge_errors(a: any, b: any) {
     else {
       //merge
       res.errors = b.errors.concat(a.errors);
-      //filter & error msg
+      //filter call by value error msg
       res.errors = res.errors.filter((e) => {
         if (e.message) {
-          return !e.message.find((l) => l.code === 4168);
+          let t = e.message.find(l => l.code == 4168);
+          return t === undefined;
         }
         return true;
       });
@@ -163,10 +164,10 @@ function merge_errors(a: any, b: any) {
       res.errors = Array.from(
         new Set(
           res.errors
-          .map(e => JSON.stringify(e))
+            .map(e => JSON.stringify(e))
         )
       )
-      .map((e:any) => JSON.parse(e));
+        .map((e: any) => JSON.parse(e));
     }
   }
 
@@ -201,7 +202,7 @@ async function run(extraArgs: string[], stdin?: string): Promise<any> {
         //other has finished
         if (o !== null) {
           let merged = merge_errors(o, global_output);
-          
+
           resolve(merged);
         }
         else {

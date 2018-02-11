@@ -12,6 +12,18 @@ import * as suppressions from './suppressions';
 import { HackTypeChecker } from './typechecker';
 import * as utils from './Utils';
 
+vscode.commands.registerCommand('hack.openBuild', async () => {
+    // vscode.window.showInformationMessage('Hello World!');
+    // vscode.window.activeTextEditor.docum
+    let ate = vscode.window.activeTextEditor;
+    if(ate){
+        let p = ate.document.fileName;
+        let build = p.replace('/src/', '/build/');
+        let td = await vscode.workspace.openTextDocument(build);
+        vscode.window.showTextDocument(td);
+    }
+});
+
 export async function activate(context: vscode.ExtensionContext) {
 
     // check if a compatible verison of hh_client is installed, or show an error message and deactivate extension typecheck & intellisense features

@@ -22,15 +22,23 @@ export class HackTypeChecker {
         }
 
         const diagnosticMap: Map<string, vscode.Diagnostic[]> = new Map();
-        typecheckResult.errors.forEach(error => {
+        for (const error of typecheckResult.errors) {
             let fullMessage = '';
             let code: number = 0;
-            error.message.forEach(messageUnit => {
+            for (const messageUnit of error.message) {
                 if (code === 0) {
                     code = messageUnit.code;
                 }
-                fullMessage = `${fullMessage} ${messageUnit.descr} [${messageUnit.code}]\n`;
-            });
+                // let r = new vscode.Range(
+                //     new vscode.Position(messageUnit.line -1, messageUnit.start -1),
+                //     new vscode.Position(messageUnit.line -1, messageUnit.end ));
+                // let td = await vscode.workspace.openTextDocument(messageUnit.path);
+                // let t = td.getText(r);
+                // let t = `${messageUnit.path}:${messageUnit.line -1}:${messageUnit.start},${messageUnit.end}`;
+                // fullMessage += `"${t}" ${messageUnit.descr} [${messageUnit.code}]\n`;
+                fullMessage += `${messageUnit.descr} [${messageUnit.code}]\n`;
+                // fullMessage += `The text: "${t}"\n`;
+            }
             const diagnostic = new vscode.Diagnostic(
                 new vscode.Range(
                     new vscode.Position(error.message[0].line - 1, error.message[0].start - 1),
@@ -46,7 +54,8 @@ export class HackTypeChecker {
             } else {
                 diagnosticMap.set(file, [diagnostic]);
             }
-        });
+        }
+
         diagnosticMap.forEach((diags, file) => {
             this.hhvmTypeDiag.set(vscode.Uri.file(file), diags);
         });
