@@ -152,23 +152,37 @@ function merge_errors(a: any, b: any) {
     else {
       //merge
       res.errors = b.errors.concat(a.errors);
-      //filter call by value error msg
-      res.errors = res.errors.filter((e) => {
-        if (e.message) {
-          let t = e.message.find(l => l.code == 4168);
-          return t === undefined;
-        }
-        return true;
-      });
-      // make unique
-      res.errors = Array.from(
-        new Set(
-          res.errors
-            .map(e => JSON.stringify(e))
-        )
-      )
-        .map((e: any) => JSON.parse(e));
+
     }
+  }
+
+  if (res && res.errors) {
+    //filter call by value error msg
+    res.errors = res.errors.filter((e) => {
+      if (e.message) {
+        let t = e.message.find(l => l.code == 4168);
+        return t === undefined;
+      }
+      return true;
+    });
+    //filter call z_hack_definitions errors
+    res.errors = res.errors.filter((e) => {
+      if (e.message) {
+        let p: string = e.message[0].path;
+
+        return !p.includes('/z_hack_definitions/');
+      }
+      return true;
+    });
+    // make unique
+    res.errors = Array.from(
+      new Set(
+        res.errors
+          .map(e => JSON.stringify(e))
+      )
+    ).map((e: any) => JSON.parse(e));
+
+
   }
 
   return res;
