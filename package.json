@@ -1,6 +1,6 @@
 {
   "name": "vscode-hack",
-  "version": "0.6.2",
+  "version": "1.0.0",
   "publisher": "Codeneric",
   "engines": {
     "vscode": "^1.15.0"
@@ -9,8 +9,17 @@
   "displayName": "Codeneric Hack",
   "description": "Hack/HHVM support for Visual Studio Code.",
   "icon": "images/logo.png",
-  "categories": ["Languages", "Linters", "Snippets", "Other"],
-  "keywords": ["hack", "hacklang", "hhvm"],
+  "categories": [
+    "Languages",
+    "Linters",
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "hack",
+    "hacklang",
+    "hhvm"
+  ],
   "galleryBanner": {
     "color": "#5d5d5d",
     "theme": "dark"
@@ -30,9 +39,15 @@
     "languages": [
       {
         "id": "hack",
-        "aliases": ["Hack", "hacklang"],
+        "aliases": [
+          "Hack",
+          "hacklang"
+        ],
         "configuration": "./hack.configuration.json",
-        "extensions": [".php", ".hh"],
+        "extensions": [
+          ".php",
+          ".hh"
+        ],
         "firstLine": "^<\\?hh\\b.*$"
       }
     ],
@@ -56,26 +71,22 @@
         "hack.clientPath": {
           "type": "string",
           "default": null,
-          "description":
-            "Absolute path to the hh_client executable. This can be left empty if hh_client is already in your environment $PATH. A `docker exec` command is supported as well."
+          "description": "Absolute path to the hh_client executable. This can be left empty if hh_client is already in your environment $PATH. A `docker exec` command is supported as well."
         },
         "hack.workspaceRootPath": {
           "type": "string",
           "default": null,
-          "description":
-            "Absolute path to the workspace root directory. This will be the VS Code workspace root by default, but can be changed if the project is in a subdirectory or mounted in a Docker container."
+          "description": "Absolute path to the workspace root directory. This will be the VS Code workspace root by default, but can be changed if the project is in a subdirectory or mounted in a Docker container."
         },
         "hack.enableCoverageCheck": {
           "type": "boolean",
           "default": false,
-          "description":
-            "Enable calculation of Hack type coverage percentage for every file and display in status bar."
+          "description": "Enable calculation of Hack type coverage percentage for every file and display in status bar."
         },
         "hack.useLanguageServer": {
           "type": "boolean",
           "default": false,
-          "description":
-            "[Experimental] Start hh_client in Language Server mode. Only works for HHVM version 3.23 and above."
+          "description": "[Experimental] Start hh_client in Language Server mode. Only works for HHVM version 3.23 and above."
         }
       }
     },
@@ -85,19 +96,22 @@
         "title": "Hack: Toggle Coverage Highlight"
       },
       {
-            "command": "hack.openBuild",
-            "title": "Open build"
-        }
+        "command": "hack.openBuild",
+        "title": "Open build"
+      }
     ]
   },
-  "activationEvents": ["workspaceContains:.hhconfig"],
+  "activationEvents": [
+    "workspaceContains:.hhconfig"
+  ],
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "npm run compile && node ./node_modules/vscode/bin/test",
-    "lint": "tslint --force -p ."
+    "lint": "tslint --force -p .",
+    "build": "vsce package"
   },
   "dependencies": {
     "vscode-jsonrpc": "3.5.0",

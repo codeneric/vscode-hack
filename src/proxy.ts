@@ -115,7 +115,7 @@ function run_hh_client(hh_client, args, resolve, stdin?: string) {
   const p = ps.execFile(
     hh_client,
     args,
-    { maxBuffer: 1024 * 1024 },
+    { maxBuffer: 1024 * 1024 * 1024 },
     (err: any, stdout, stderr) => {
       if (err !== null && err.code !== 0 && err.code !== 2) {
         // any hh_client failure other than typecheck errors
@@ -191,11 +191,12 @@ function merge_errors(a: any, b: any) {
 
 async function run(extraArgs: string[], stdin?: string): Promise<any> {
   return new Promise<any>((resolve, _) => {
-    let docker_hh_client = config.hhClientCommand;
-    let latest_hh_client = 'hh_client';
-
-    let docker_hh = { 'hh_client': docker_hh_client, 'args': config.hhClientArgs };
-    let latest_hh = { 'hh_client': latest_hh_client, 'args': [] };
+    // let docker_hh_client = config.hhClientCommand;
+    // let latest_hh_client = 'hh_client';
+    let latest_hh_cont_name = `${config.get_container_name(config.workspace)}_2`;
+    // let docker_hh = { 'hh_client': docker_hh_client, 'args': config.hhClientArgs };
+    // let latest_hh = { 'hh_client': latest_hh_client, 'args': [] };
+    let latest_hh = { 'hh_client': 'docker', 'args': ['exec', '-i', latest_hh_cont_name, 'hh_client'] };
     let hhcs: any[] = [latest_hh];
 
 
@@ -203,9 +204,10 @@ async function run(extraArgs: string[], stdin?: string): Promise<any> {
     if (extraArgs.indexOf("--type-at-pos") >= 0) {
       hhcs = [latest_hh];
     }
-    if (extraArgs.indexOf("check") >= 0) {
-      hhcs = [latest_hh, docker_hh];
-    }
+    // if (extraArgs.indexOf("check") >= 0) {
+    //   hhcs = [latest_hh, docker_hh];
+    // }
+    // hhcs = [docker_hh]; //DISABLE LOCALLY INSTALLED HACK
 
     let finished_children = 0;
     let global_output: any = null;
