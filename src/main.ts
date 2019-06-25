@@ -16,9 +16,11 @@ vscode.commands.registerCommand('hack.openBuild', async () => {
     // vscode.window.showInformationMessage('Hello World!');
     // vscode.window.activeTextEditor.docum
     let ate = vscode.window.activeTextEditor;
-    if(ate){
+    if (ate) {
         let p = ate.document.fileName;
-        let build = p.replace('/src/', '/plz-out/gen/src/base/build/dev/');
+        let build = p
+            .replace('/src/base/', '/plz-out/gen/src/base/build/dev/')
+            .replace('/src/premium/', '/plz-out/gen/src/premium/build/dev/');
         let td = await vscode.workspace.openTextDocument(build);
         vscode.window.showTextDocument(td);
     }
@@ -27,15 +29,15 @@ vscode.commands.registerCommand('hack.openBuild', async () => {
 export async function activate(context: vscode.ExtensionContext) {
 
     // check if a compatible verison of hh_client is installed, or show an error message and deactivate extension typecheck & intellisense features
-    try{
+    try {
         await hh_client.start_hack_container();
-    }catch(e){
+    } catch (e) {
         vscode.window.showErrorMessage(
             `Codeneric: failed to start hack container!`
         );
         return;
     }
-    
+
     const version = await hh_client.version();
     if (!version) {
         vscode.window.showErrorMessage(
