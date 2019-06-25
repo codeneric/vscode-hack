@@ -18,7 +18,7 @@ vscode.commands.registerCommand('hack.openBuild', async () => {
     let ate = vscode.window.activeTextEditor;
     if(ate){
         let p = ate.document.fileName;
-        let build = p.replace('/src/', '/build/');
+        let build = p.replace('/src/', '/plz-out/gen/src/base/build/dev/');
         let td = await vscode.workspace.openTextDocument(build);
         vscode.window.showTextDocument(td);
     }
